@@ -5,7 +5,7 @@ An openmock docker image for dsrhub http and grpc server
 
 Run with docker run:
 ```sh
-$ docker run -it -v $(PWD):/data/templates -p 9999:9999 -p 50051:50051 dsrhub/mock
+$ docker run -it -v $(PWD)/demo_templates:/data/templates -p 9999:9999 -p 50051:50051 dsrhub/mock
 ```
 
 Run with docker-compose:
@@ -17,7 +17,7 @@ services:
     container_name: dsrhub_openmock
     restart: on-failure
     volumes:
-      - "./mocks/openmock_templates:/data/templates"
+      - "./demo_templates:/data/templates"
     ports:
       - "9999:9999"
       - "50051:50051"
