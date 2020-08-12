@@ -1,0 +1,89 @@
+- key: identityResolutionToEmail
+  kind: Behavior
+  expect:
+    http:
+      method: POST
+      path: /:service_name/dsrhub/exchange_identity
+    condition: '{{.HTTPPath | contains `email`}}'
+  actions:
+    - reply_http:
+        status_code: 200
+        body: >-
+          {
+            "identity_type": "email",
+            "identity_format": "raw",
+            "identity_value": "john@example.com"
+          }
+
+- key: identityResolutionToCandidateID
+  kind: Behavior
+  expect:
+    http:
+      method: POST
+      path: /:service_name/dsrhub/exchange_identity
+    condition: '{{.HTTPPath | contains `candidate`}}'
+  actions:
+    - reply_http:
+        status_code: 200
+        body: >-
+          {
+            "identity_type": "candidate_id",
+            "identity_format": "raw",
+            "identity_value": "candidate_id_abc"
+          }
+
+- key: identityResolutionToProviderRequestID
+  kind: Behavior
+  expect:
+    http:
+      method: POST
+      path: /:service_name/dsrhub/exchange_identity
+    condition: '{{.HTTPPath | contains `provider`}}'
+  actions:
+    - reply_http:
+        status_code: 200
+        body: >-
+          {
+            "identity_type": "provider_request_id",
+            "identity_format": "raw",
+            "identity_value": "provider_request_id_xyz"
+          }
+
+- key: createDSR
+  kind: Behavior
+  expect:
+    http:
+      method: POST
+      path: /:service_name/dsrhub/create_dsr_request
+  actions:
+    - reply_http:
+        status_code: 200
+        body: >-
+          {
+            "regulation": "gdpr",
+            "controller_id": "{{ .HTTPPath }}",
+            "request_status": "completed",
+            "subject_request_id": "{{.HTTPBody | jsonPath `subject_request_id`}}",
+            "subject_request_type": "erasure",
+            "identity_type": "{{.HTTPBody | jsonPath `identity_type`}}",
+            "identity_format": "{{.HTTPBody | jsonPath `identity_format`}}",
+            "identity_value": "{{.HTTPBody | jsonPath `identity_value`}}"
+          }
+
+    - sleep:
+        duration: 3s
+    - send_http:
+        url: '{{.HTTPBody | jsonPath `status_callback_url`}}'
+        method: POST
+        body: >-
+          {
+            "regulation": "gdpr",
+            "controller_id": "{{ .HTTPPath }}",
+            "request_status": "completed",
+            "subject_request_id": "{{.HTTPBody | jsonPath `subject_request_id`}}",
+            "subject_request_type": "erasure",
+            "identity_type": "{{.HTTPBody | jsonPath `identity_type`}}",
+            "identity_format": "{{.HTTPBody | jsonPath `identity_format`}}",
+            "identity_value": "{{.HTTPBody | jsonPath `identity_value`}}"
+          }
+

@@ -1,0 +1,18 @@
+- key: dsrhub_grpc
+  expect:
+    grpc:
+      service: idl.dsrhub.DSRHubService
+      method: CreateDSR
+  actions:
+    - reply_grpc:
+        payload: >
+          {
+            "regulation": "gdpr",
+            "controller_id": "dsrhub_grpc_mock",
+            "request_status": "completed",
+            "subject_request_id": "{{.GRPCPayload | jsonPath `subject_request_id`}}",
+            "subject_request_type": "erasure",
+            "identity_type": "{{.GRPCPayload | jsonPath `identity_type`}}",
+            "identity_format": "{{.GRPCPayload | jsonPath `identity_format`}}",
+            "identity_value": "{{.GRPCPayload | jsonPath `identity_value`}}"
+          }
